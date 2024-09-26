@@ -1,5 +1,28 @@
+# Ignoruj katalog z modułami Node.js
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
+
+# Ignoruj pliki konfiguracyjne środowiska
+.env
+
+# Ignoruj raporty z testów Playwright
+playwright-report/
+
+# Ignoruj wyniki testów
+test-results/
+
+# Ignoruj pliki logów
+logs/
+*.log
+
+# Ignoruj pliki tymczasowe systemu
+.DS_Store
+Thumbs.db
+
+# Ignoruj raporty pokrycia kodu (jeśli używasz)
+coverage/
+
+# Ignoruj pliki wygenerowane przez edytory/IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
