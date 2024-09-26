@@ -2,9 +2,9 @@ name: Playwright Tests and Publish Reports
 
 on:
   push:
-    branches: [main]  # Zmień na swoją główną gałąź
+    branches: [main]  # Upewnij się, że to Twoja główna gałąź
   pull_request:
-    branches: [main]  # Jeśli chcesz uruchamiać testy na pull requestach
+    branches: [main]
 
 jobs:
   test-and-publish:
@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'  # Upewnij się, że wersja Node.js jest zgodna z Twoim projektem
 
