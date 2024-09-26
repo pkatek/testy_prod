@@ -2,7 +2,7 @@ name: Playwright Tests and Publish Reports
 
 on:
   push:
-    branches: [main]  # Upewnij się, że to Twoja główna gałąź
+    branches: [main]  # Replace with your main branch
   pull_request:
     branches: [main]
 
@@ -17,10 +17,14 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
-          node-version: '18'  # Upewnij się, że wersja Node.js jest zgodna z Twoim projektem
+          node-version: '18'  # Use the Node.js version compatible with your project
 
       - name: Install dependencies
         run: npm install
+
+      # **Add this step to install browsers**
+      - name: Install Playwright browsers
+        run: npx playwright install
 
       - name: Run Playwright tests
         env:
