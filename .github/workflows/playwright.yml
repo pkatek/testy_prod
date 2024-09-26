@@ -2,7 +2,7 @@ name: Playwright Tests and Publish Reports
 
 on:
   push:
-    branches: [main]
+    branches: [main]  # Replace with your main branch
   pull_request:
     branches: [main]
 
@@ -14,12 +14,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # **Use the Playwright GitHub Action**
-      - name: Setup Playwright environment
-        uses: microsoft/playwright-github-action@v1
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
         with:
-          install-dependencies: true  # Installs system dependencies
-          version: '1.37.1'  # Optional: specify the Playwright version
+          node-version: '18'  # Use the Node.js version compatible with your project
+
+      - name: Install dependencies
+        run: npm install
+
+      # **Add this step to install system dependencies**
+      - name: Install Playwright dependencies
+        run: npx playwright install-deps
+
+      - name: Install Playwright browsers
+        run: npx playwright install
 
       - name: Run Playwright tests
         env:
