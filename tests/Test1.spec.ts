@@ -2,8 +2,10 @@ import { test, expect } from "@playwright/test";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-test("Logowanie w trakcie zakupu", async ({ page }) => {
+test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
   test.setTimeout(120000); // Ustawienie globalnego timeoutu na 120 sekund dla tego testu
+
+  console.log(`Uruchamianie testu na przeglądarce: ${browserName}`);
 
   // Przejdź do strony biżuterii
   console.log("Otwieranie strony: /bizuteria");
@@ -101,6 +103,24 @@ test("Logowanie w trakcie zakupu", async ({ page }) => {
     console.log(`Sprawdzanie towaru nr ${i + 1}: ${formattedCartProductTitle}`);
   }
 
+  // Sprawdź i zamknij nakładkę, jeśli się pojawi
+  console.log("Sprawdzam, czy nie ma nakładek zasłaniających przycisk.");
+  const obstructingOverlay = page.locator(".wrapperParent.scale");
+  if (await obstructingOverlay.isVisible()) {
+    console.log("Nakładka wykryta. Zamykanie jej.");
+    // Zamknij nakładkę
+    await page.evaluate(() => {
+      const overlay = document.querySelector(".wrapperParent.scale");
+      if (overlay) {
+        overlay.style.display = "none";
+      }
+    });
+    // Poczekaj, aż nakładka zniknie
+    await expect(obstructingOverlay).toBeHidden();
+  } else {
+    console.log("Nie wykryto żadnych nakładek.");
+  }
+
   console.log("Klikam 'Zrealizuj zamówienie'.");
   await page.getByRole("button", { name: "Zrealizuj zamówienie" }).click();
 
@@ -122,6 +142,25 @@ test("Logowanie w trakcie zakupu", async ({ page }) => {
   // Przejdź do koszyka po zalogowaniu
   console.log("Wracam do koszyka po zalogowaniu.");
   await page.goto("https://yes.pl/koszyk", { waitUntil: "networkidle" });
+
+  // Ponownie sprawdź i zamknij nakładkę, jeśli się pojawi
+  console.log(
+    "Sprawdzam ponownie, czy nie ma nakładek zasłaniających przycisk."
+  );
+  if (await obstructingOverlay.isVisible()) {
+    console.log("Nakładka wykryta. Zamykanie jej.");
+    // Zamknij nakładkę
+    await page.evaluate(() => {
+      const overlay = document.querySelector(".wrapperParent.scale");
+      if (overlay) {
+        overlay.style.display = "none";
+      }
+    });
+    // Poczekaj, aż nakładka zniknie
+    await expect(obstructingOverlay).toBeHidden();
+  } else {
+    console.log("Nie wykryto żadnych nakładek.");
+  }
 
   // Kliknij "Zrealizuj zamówienie"
   console.log("Finalizacja zamówienia.");
