@@ -2,9 +2,7 @@ import { test, expect } from "@playwright/test";
 import * as dotenv from "dotenv";
 dotenv.config();
 
-test("Dodaj 3 towary do koszyka z /bizuteria i sprawdź koszyk", async ({
-  page,
-}) => {
+test("Logowanie w trakcie zakupu", async ({ page }) => {
   test.setTimeout(120000); // Ustawienie globalnego timeoutu na 120 sekund dla tego testu
 
   // Przejdź do strony biżuterii
