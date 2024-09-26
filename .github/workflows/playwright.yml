@@ -1,47 +1,8 @@
-name: Playwright Tests and Publish Reports
+name: Playwright Tests
 
-on:
-  push:
-    branches: [main]  # Replace with your main branch
-  pull_request:
-    branches: [main]
+on: [push, pull_request]
 
 jobs:
-  test-and-publish:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'  # Use the Node.js version compatible with your project
-
-      - name: Install dependencies
-        run: npm install
-
-      # **Add this step to install system dependencies**
-      - name: Install Playwright dependencies
-        run: npx playwright install-deps
-
-      - name: Install Playwright browsers
-        run: npx playwright install
-
-      - name: Run Playwright tests
-        env:
-          EMAIL: ${{ secrets.EMAIL }}
-          PASSWORD: ${{ secrets.PASSWORD }}
-        run: npx playwright test Test1.spec.ts --reporter=html
-
-      - name: Deploy report to GitHub Pages
-        if: success()
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: playwright-report
-
   test:
     runs-on: ubuntu-latest
 
