@@ -78,11 +78,11 @@ jobs:
 
       - name: Notify Slack
         if: always()
-        uses: 8398a7/action-slack@v3.19.0
+        uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           text: |
             Testy Playwright zakończone.
             Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
         env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
