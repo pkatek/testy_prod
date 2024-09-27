@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 * * * *' # Co godzine
+    - cron: '0 * * * *' # Codziennie o północy
 
 permissions:
   contents: write
@@ -46,7 +46,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-report-${{ matrix.browser }}  # Nazwa artefaktu zależna od przeglądarki
           path: playwright-report/
           retention-days: 30
 
@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          name: playwright-report-$matrix.browser  # Pobierz poprawny artefakt
+          name: playwright-report-${{ matrix.browser }}  # Pobierz odpowiedni artefakt zależnie od przeglądarki
           path: playwright-report
 
       - name: Setup Pages
@@ -76,3 +76,14 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: playwright-report
+
+      - name: Notify Slack
+        if: always()  # Powiadomienie o zakończeniu joba, niezależnie od sukcesu/niepowodzenia
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Testy Playwright zakończone.
+            Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
