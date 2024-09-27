@@ -35,8 +35,8 @@ test("Logowanie i sprawdzenie konta", async ({ page, browserName }) => {
 
   // Zaloguj się na konto
   console.log("Wprowadzam dane logowania.");
-  const email = process.env.EMAIL;
-  const password = process.env.PASSWORD;
+  const email = process.env.EMAIL2;
+  const password = process.env.PASSWORD2;
 
   if (!email || !password) {
     throw new Error(
