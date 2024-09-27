@@ -9,7 +9,7 @@ on:
     - cron: '0 * * * *' # Codziennie o północy
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -72,6 +72,9 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: playwright-report
 
       - name: Notify Slack
         if: always()
