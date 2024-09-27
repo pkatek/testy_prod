@@ -25,14 +25,14 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 18
           cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+        run: npx playwright install --with-deps  # Zainstaluj wszystkie przeglądarki
 
       - name: Run Playwright tests
         run: npx playwright test --project=${{ matrix.browser }}
@@ -46,7 +46,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-report-${{ matrix.browser }}
+          name: playwright-report-${{ matrix.browser }}  # Zgodnie z nazwą artefaktu dla każdej przeglądarki
           path: playwright-report/
           retention-days: 30
 
@@ -59,7 +59,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
         with:
-          path: playwright-reports
+          name: playwright-report-${{ matrix.browser }}  # Zgodnie z nazwą artefaktu dla każdej przeglądarki
+          path: playwright-report
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
@@ -67,7 +68,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
-          path: 'playwright-reports'
+          path: 'playwright-report'  # Zgodność nazw folderów
 
       - name: Deploy to GitHub Pages
         id: deployment
