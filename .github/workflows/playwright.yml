@@ -42,6 +42,9 @@ jobs:
           EMAIL2: ${{ secrets.EMAIL2 }}
           PASSWORD2: ${{ secrets.PASSWORD2 }}
 
+      - name: Check if Playwright report exists
+        run: if [ -d "playwright-report" ]; then echo "Report exists"; else echo "Report not found"; exit 1; fi
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
@@ -75,7 +78,7 @@ jobs:
 
       - name: Notify Slack
         if: always()
-        uses: 8398a7/action-slack@v3
+        uses: 8398a7/action-slack@v3.19.0
         with:
           status: ${{ job.status }}
           text: |
