@@ -2,46 +2,83 @@ name: Playwright Tests
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   schedule:
     - cron: '0 * * * *' # Uruchamianie co godzinę
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: 18
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install Playwright dependencies
-        run: npx playwright install-deps
+        run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install
+        run: npx playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run Playwright tests
+        run: npx playwright test --project=${{ matrix.browser }}
         env:
           EMAIL: ${{ secrets.EMAIL }}
           PASSWORD: ${{ secrets.PASSWORD }}
           EMAIL2: ${{ secrets.EMAIL2 }}
           PASSWORD2: ${{ secrets.PASSWORD2 }}
-        run: npx playwright test --workers=1 --reporter=html --timeout=60000
 
-      - name: Deploy report to GitHub Pages
-        if: success()
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: playwright-report
+          name: playwright-report-${{ matrix.browser }}
+          path: playwright-report/
+          retention-days: 30
+
+  deploy-report:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          path: playwright-reports
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'playwright-reports'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Testy Playwright zakończone.
+            Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
