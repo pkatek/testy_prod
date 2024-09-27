@@ -84,4 +84,5 @@ jobs:
           text: |
             Testy Playwright zakończone.
             Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
-        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+            slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
