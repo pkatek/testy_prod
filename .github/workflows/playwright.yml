@@ -75,14 +75,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: playwright-report
-
-      - name: Notify Slack
-        if: always()
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          text: |
-            Testy Playwright zakończone.
-            Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
-        env:
-            slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
