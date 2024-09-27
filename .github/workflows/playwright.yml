@@ -35,7 +35,7 @@ jobs:
         env:
           EMAIL: ${{ secrets.EMAIL }}
           PASSWORD: ${{ secrets.PASSWORD }}
-        run: npx playwright test Test1.spec.ts --reporter=html --timeout=60000
+        run: npx playwright test --workers=1 --reporter=html --timeout=60000
 
       - name: Deploy report to GitHub Pages
         if: success()

@@ -207,7 +207,9 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
   console.log("Koszyk został wyczyszczony.");
 
   console.log("Wylogowywanie po teście.");
-  await page.goto("https://yes.pl/wyloguj", { waitUntil: "networkidle" });
+  await page.goto("https://yes.pl/customer/account/logout/", {
+    waitUntil: "networkidle",
+  });
 
   console.log("Test zakończony.");
 });

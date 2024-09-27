@@ -18,7 +18,7 @@ export default defineConfig({
   timeout: 120000,
 
   /* Uruchamianie testów w plikach równolegle */
-  fullyParallel: true,
+  fullyParallel: false,
 
   /* Zakończ budowanie na CI, jeśli przypadkowo pozostawiono test.only w kodzie źródłowym */
   forbidOnly: !!process.env.CI,
