@@ -6,6 +6,8 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
   test.setTimeout(120000); // Ustawienie globalnego timeoutu na 120 sekund dla tego testu
 
   console.log(`Uruchamianie testu na przeglądarce: ${browserName}`);
+  await page.context().clearCookies();
+  await page.context().clearPermissions();
 
   // Przejdź do strony biżuterii
   console.log("Otwieranie strony: /bizuteria");
@@ -102,7 +104,7 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
 
     console.log(`Sprawdzanie towaru nr ${i + 1}: ${formattedCartProductTitle}`);
   }
-
+  await page.waitForTimeout(1000);
   // Sprawdź i zamknij nakładkę, jeśli się pojawi
   console.log("Sprawdzam, czy nie ma nakładek zasłaniających przycisk.");
   const obstructingOverlay = page.locator(".wrapperParent.scale");
@@ -122,7 +124,9 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
   }
 
   console.log("Klikam 'Zrealizuj zamówienie'.");
-  await page.getByRole("button", { name: "Zrealizuj zamówienie" }).click();
+  await page
+    .getByRole("button", { name: "Zrealizuj zamówienie" })
+    .click({ timeout: 60000 });
 
   // Zaloguj się na konto
   console.log("Wprowadzam dane logowania.");
@@ -142,7 +146,7 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
   // Przejdź do koszyka po zalogowaniu
   console.log("Wracam do koszyka po zalogowaniu.");
   await page.goto("https://yes.pl/koszyk", { waitUntil: "networkidle" });
-
+  await page.waitForTimeout(1000);
   // Ponownie sprawdź i zamknij nakładkę, jeśli się pojawi
   console.log(
     "Sprawdzam ponownie, czy nie ma nakładek zasłaniających przycisk."
@@ -164,7 +168,9 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
 
   // Kliknij "Zrealizuj zamówienie"
   console.log("Finalizacja zamówienia.");
-  await page.getByRole("button", { name: "Zrealizuj zamówienie" }).click();
+  await page
+    .getByRole("button", { name: "Zrealizuj zamówienie" })
+    .click({ timeout: 60000 });
 
   // Zweryfikuj obecność "Polska" w sekcji adresu
   const divSelector = "div.section-address-select"; // Właściwy selektor
@@ -175,16 +181,33 @@ test("Logowanie w trakcie zakupu", async ({ page, browserName }) => {
   console.log(`Czy sekcja adresu zawiera "Polska"?: ${containsPolska}`);
   expect(containsPolska).toBe(true);
 
-  // Wyczyść koszyk po teście
+  // Wroc do koszyka oczyscic koszyk
+  console.log("Wracam do koszyka aby go oczyscic.");
+  await page.goto("https://yes.pl/koszyk", { waitUntil: "networkidle" });
+  await page.waitForTimeout(1000);
+
   console.log("Czyszczenie koszyka.");
-  const removeButtons = page.locator("a.btn-remove");
-  const removeCount = await removeButtons.count();
-  for (let j = removeCount - 1; j >= 0; j--) {
-    console.log(`Usuwam produkt nr ${j + 1}`);
-    const removeButton = removeButtons.nth(j);
-    await removeButton.click({ force: true });
-    await page.waitForTimeout(1000);
+
+  const removeButtons = await page.$$("a.btn-remove.btn-remove2");
+  for (const removeButton of removeButtons) {
+    const onclickValue = await removeButton.getAttribute("onclick");
+    const match = onclickValue?.match(/removeProdClick\('(.+?)'\)/);
+    if (match && match[1]) {
+      const productId = match[1];
+      console.log(`Usuwam produkt o ID: ${productId}`);
+      await page.evaluate((id) => {
+        removeProdClick(id);
+      }, productId);
+      // Poczekaj na aktualizację koszyka
+      await page.waitForLoadState("networkidle");
+      await page.waitForTimeout(1000);
+    }
   }
+
+  console.log("Koszyk został wyczyszczony.");
+
+  console.log("Wylogowywanie po teście.");
+  await page.goto("https://yes.pl/wyloguj", { waitUntil: "networkidle" });
 
   console.log("Test zakończony.");
 });
