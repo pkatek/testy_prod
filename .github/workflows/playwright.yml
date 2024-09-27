@@ -32,7 +32,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps ${{ matrix.browser }}
+        run: npx playwright install --with-deps
 
       - name: Run Playwright tests
         run: npx playwright test --project=${{ matrix.browser }} --reporter=html
@@ -46,7 +46,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-report-${{ matrix.browser }}  # Nazwa artefaktu zależna od przeglądarki
+          name: playwright-report
           path: playwright-report/
           retention-days: 30
 
@@ -57,10 +57,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
-        with:
-          name: playwright-report-${{ matrix.browser }}  # Pobierz odpowiedni artefakt zależnie od przeglądarki
-          path: playwright-report
 
       - name: Setup Pages
         uses: actions/configure-pages@v3
@@ -78,7 +74,7 @@ jobs:
           publish_dir: playwright-report
 
       - name: Notify Slack
-        if: always()  # Powiadomienie o zakończeniu joba, niezależnie od sukcesu/niepowodzenia
+        if: always()
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
