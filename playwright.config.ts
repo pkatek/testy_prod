@@ -1,24 +1,85 @@
-import { defineConfig } from "@playwright/test";
+import { defineConfig, devices } from "@playwright/test";
 
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
 export default defineConfig({
-  // Twoje istniejące ustawienia i projekty
-  projects: [
-    { name: "Chromium", use: { browserName: "chromium" } },
-    { name: "Firefox", use: { browserName: "firefox" } },
-    { name: "WebKit", use: { browserName: "webkit" } },
-    // Dodaj inne przeglądarki lub konfiguracje, które już masz
-  ],
+  testDir: "./tests",
 
-  // Konfiguracja do generowania jednego raportu
+  /* Maksymalny czas trwania pojedynczego testu */
+  timeout: 120000,
+
+  /* Uruchamianie testów w plikach równolegle */
+  fullyParallel: false,
+
+  /* Zakończ budowanie na CI, jeśli przypadkowo pozostawiono test.only w kodzie źródłowym */
+  forbidOnly: !!process.env.CI,
+
+  /* Liczba ponownych prób na CI */
+  retries: process.env.CI ? 2 : 0,
+
+  /* Wyłączenie równoległych testów na CI */
+  workers: process.env.CI ? 1 : undefined,
+
+  /* Konfiguracja raportera */
   reporter: [["html", { outputFolder: "playwright-report", open: "never" }]],
 
-  // Pozostaw inne ustawienia, które są w Twojej obecnej konfiguracji
+  /* Wspólne ustawienia dla wszystkich projektów poniżej */
   use: {
-    headless: true, // Możesz zmienić na false, jeśli potrzebujesz testów bez headless
-    screenshot: "on", // Zachowuje zrzuty ekranu w przypadku błędów
-    video: "retain-on-failure", // Nagrania tylko, jeśli testy się nie powiodą
+    /* Kolekcjonowanie śladu przy ponownych próbach nieudanego testu */
+    trace: "on-first-retry",
   },
 
-  // Dodaj pozostałe ustawienia, które masz w swoim pliku config.ts
-  testDir: "./tests", // Ścieżka do katalogu z testami, upewnij się, że jest poprawna
+  /* Konfiguracja projektów dla głównych przeglądarek */
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
+
+    /* Testowanie na widokach mobilnych (opcjonalne) */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+
+    /* Testowanie na markowych przeglądarkach (opcjonalne) */
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    // },
+  ],
+
+  /* Uruchamianie lokalnego serwera przed rozpoczęciem testów (jeśli potrzebne) */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://127.0.0.1:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
 });
