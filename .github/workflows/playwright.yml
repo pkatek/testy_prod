@@ -52,7 +52,7 @@ jobs:
         with:
           status: ${{ job.status }}
           text: |
-            Testy Playwright zakończone.
-            Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
+            Testy Playwright zakończone z wynikiem: ${{ job.status }}.
+            Raport dostępny na: <https://sebchrob.github.io/testy_prod/|kliknij tutaj>
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
