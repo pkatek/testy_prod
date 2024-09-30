@@ -40,7 +40,19 @@ jobs:
         run: npx playwright test --workers=1 --reporter=html --timeout=60000
 
       - name: Deploy report to GitHub Pages
+        if: always()
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: playwright-report
+
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: |
+            Testy Playwright zakończone.
+            Raport dostępny na: ${{ steps.deployment.outputs.page_url }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
